@@ -1,7 +1,7 @@
 import csv
 import datetime
 
-from models.dia_trabalho import DiaTrabalho
+from app.models.dia_trabalho import DiaTrabalho
 
 
 def extract_dia_trabalho_from_csv(path: str) -> list[DiaTrabalho]:
