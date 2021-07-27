@@ -1,5 +1,4 @@
 import datetime
-import time
 import typing
 from dataclasses import dataclass
 from enum import Enum
@@ -24,15 +23,19 @@ class TipoResultado(Enum):
         return cls.NA
 
 
+class Batida:
+    data_hora_batida: datetime.time
+    tipo: str
+    comentario: str
+    aprovada: bool
+
+
 @dataclass
 class DiaTrabalho:
-    data: datetime.date
-    entrada: typing.Optional[datetime.time] = None
-    pausa: typing.Optional[datetime.time] = None
-    retorno: typing.Optional[datetime.time] = None
-    saida: typing.Optional[datetime.time] = None
-    tipo_resultado: typing.Optional[TipoResultado] = None
-    resultado: typing.Optional[str] = None
+    data_trabalho: datetime.date
+    batidas: typing.List[Batida]
+    quantidade_horas_trabalho: int
+    # resultado: typing.Optional[datetime.time]
 
 
 def get_modelo_comercial(dia_trabalho: DiaTrabalho) -> int:
