@@ -1,10 +1,7 @@
 import datetime
-import typing
 from dataclasses import dataclass
 from enum import Enum
-
-COMERCIAL_WORK_DAY_IN_SECONDS = 32400
-NORMAL_WORK_DAY_IN_SECONDS = 28800
+import typing
 
 
 class TipoResultado(Enum):
@@ -23,36 +20,28 @@ class TipoResultado(Enum):
         return cls.NA
 
 
+@dataclass
 class Batida:
-    data_hora_batida: datetime.time
+    hora_batida: datetime.time
     tipo: str
     comentario: str
     aprovada: bool
 
 
-@dataclass
 class DiaTrabalho:
-    data_trabalho: datetime.date
-    batidas: typing.List[Batida]
-    quantidade_horas_trabalho: int
-    # resultado: typing.Optional[datetime.time]
 
+    def __init__(self, data: datetime.datetime, horas_para_trabalhar: typing.Union[int, datetime.timedelta], batidas: list = None):
 
-def get_modelo_comercial(dia_trabalho: DiaTrabalho) -> int:
-    return NORMAL_WORK_DAY_IN_SECONDS if dia_trabalho.data.strftime('%A').upper() == 'FRIDAY' else COMERCIAL_WORK_DAY_IN_SECONDS
+        if type(horas_para_trabalhar, datetime.timedelta):
+            self.horas_para_trabalhar = horas_para_trabalhar
+        else:
+            self.horas_para_trabalhar = datetime.timedelta(hours=horas_para_trabalhar)
 
+        self.data_trabalho = data
+        self.batidas = batidas or []
+        self.resultado = None
 
-def get_modelo_normal(dia_trabalho: DiaTrabalho) -> int:
-    return NORMAL_WORK_DAY_IN_SECONDS
-
-
-class TipoHorario:
-    COMERCIAL = 'comercial'
-    NORMAL = 'normal'
-
-    @classmethod
-    def get_horario_por_modelo(cls, modelo: 'TipoHorario') -> typing.Callable:
-        return {
-            cls.COMERCIAL: get_modelo_comercial,
-            cls.NORMAL: get_modelo_normal,
-        }.get(modelo)
+    def bater_ponto(self, tipo: str, comentario: str = '') -> None:
+        nova_batida = Batida(hora_batida=datetime.datetime.now().time(),
+                                tipo=tipo, comentario=comentario, aprovada=False)
+        self.batidas.append(nova_batida)
