@@ -2,7 +2,7 @@ import csv
 import datetime
 import typing
 
-from app.models.dia_trabalho import DiaTrabalho
+from app.dia_trabalho.models import DiaTrabalho
 
 
 def extract_dia_trabalho_from_csv(path: str) -> typing.List[DiaTrabalho]:
