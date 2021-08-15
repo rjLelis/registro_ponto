@@ -12,7 +12,7 @@ def test_calcular_horas_trabalhadas():
                 models.Batida(datetime.time(hour=12), 'almoço', '', True),
                 models.Batida(datetime.time(hour=13), 'volta', '', True),
                 models.Batida(datetime.time(hour=18), 'saida', '', True),],
-        quantidade_horas_trabalho=8,
+        horas_para_trabalhar=8,
     )
 
     resultado = services.calcular_horas_trabalhadas(dia)
@@ -30,7 +30,7 @@ def test_calcular_horas_trabalhadas_batidas_fora_de_ordem():
     dia = models.DiaTrabalho(
         data=datetime.date(year=2021, month=3, day=23),
         batidas=batidas,
-        quantidade_horas_trabalho=8,
+        horas_para_trabalhar=8,
     )
 
     resultado = services.calcular_horas_trabalhadas(dia)
@@ -48,7 +48,7 @@ def test_calcular_horas_trabalhadas_pausa_nao_compensada():
                 models.Batida(datetime.time(hour=16), 'pausa', '', True),
                 models.Batida(datetime.time(hour=16, minute=30), 'volta', '', True),
                 models.Batida(datetime.time(hour=18), 'saida', '', True),],
-        quantidade_horas_trabalho=8,
+        horas_para_trabalhar=8,
     )
 
     resultado = services.calcular_horas_trabalhadas(dia)
@@ -66,10 +66,41 @@ def test_calcular_horas_trabalhadas_pausa_compensada():
                 models.Batida(datetime.time(hour=16), 'pausa', '', True),
                 models.Batida(datetime.time(hour=16, minute=30), 'volta', '', True),
                 models.Batida(datetime.time(hour=18, minute=30), 'saida', '', True),],
-        quantidade_horas_trabalho=8,
+        horas_para_trabalhar=8,
     )
 
     resultado = services.calcular_horas_trabalhadas(dia)
     esperado = datetime.timedelta(hours=8)
+
+    assert resultado == esperado
+
+
+def test_calcular_horas_restantes_sem_horas_restantes():
+    dia = models.DiaTrabalho(
+        data=datetime.date(year=2021, month=3, day=23),
+        batidas=[models.Batida(datetime.time(hour=9), 'entrada', '', True),
+                models.Batida(datetime.time(hour=12), 'almoço', '', True),
+                models.Batida(datetime.time(hour=13), 'volta', '', True),
+                models.Batida(datetime.time(hour=18), 'saida', '', True),],
+        horas_para_trabalhar=8,
+    )
+
+    resultado = services.calcular_horas_restantes(dia)
+    esperado = datetime.timedelta(hours=0)
+
+    assert resultado == esperado
+
+def test_calcular_horas_restantes_faltando_horas():
+    dia = models.DiaTrabalho(
+        data=datetime.date(year=2021, month=3, day=23),
+        batidas=[models.Batida(datetime.time(hour=10), 'entrada', '', True),
+                models.Batida(datetime.time(hour=12), 'almoço', '', True),
+                models.Batida(datetime.time(hour=13), 'volta', '', True),
+                models.Batida(datetime.time(hour=18), 'saida', '', True),],
+        horas_para_trabalhar=8,
+    )
+
+    resultado = services.calcular_horas_restantes(dia)
+    esperado = datetime.timedelta(hours=1)
 
     assert resultado == esperado

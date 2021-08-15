@@ -32,7 +32,7 @@ class DiaTrabalho:
 
     def __init__(self, data: datetime.datetime, horas_para_trabalhar: typing.Union[int, datetime.timedelta], batidas: list = None):
 
-        if type(horas_para_trabalhar, datetime.timedelta):
+        if isinstance(horas_para_trabalhar, datetime.timedelta):
             self.horas_para_trabalhar = horas_para_trabalhar
         else:
             self.horas_para_trabalhar = datetime.timedelta(hours=horas_para_trabalhar)
