@@ -85,7 +85,7 @@ def test_calcular_horas_restantes_sem_horas_restantes():
         horas_para_trabalhar=8,
     )
 
-    resultado = services.calcular_horas_restantes(dia)
+    resultado = services.calcular_horas_restantes(dia, datetime.timedelta(hours=8))
     esperado = datetime.timedelta(hours=0)
 
     assert resultado == esperado
@@ -100,7 +100,22 @@ def test_calcular_horas_restantes_faltando_horas():
         horas_para_trabalhar=8,
     )
 
-    resultado = services.calcular_horas_restantes(dia)
+    resultado = services.calcular_horas_restantes(dia, datetime.timedelta(hours=7))
     esperado = datetime.timedelta(hours=1)
+
+    assert resultado == esperado
+
+
+def test_calcular_horas_trabalhadas_batida_sem_par():
+    dia = models.DiaTrabalho(
+        data=datetime.date(year=2021, month=3, day=23),
+        batidas=[models.Batida(datetime.time(hour=9), 'entrada', '', True),
+                models.Batida(datetime.time(hour=12), 'entrada', '', True),
+                models.Batida(datetime.time(hour=13), 'saida', '', True),],
+        horas_para_trabalhar=8,
+    )
+
+    resultado = services.calcular_batidas_sem_par(dia)
+    esperado = datetime.timedelta(hours=4)
 
     assert resultado == esperado

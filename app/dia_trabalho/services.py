@@ -6,6 +6,18 @@ from more_itertools import grouper
 from .models import DiaTrabalho
 
 
+def calcular_horas(dia_trabalho: DiaTrabalho):
+    if len(dia_trabalho) == 1:
+        return datetime.timedelta(hours=0), dia_trabalho.horas_para_trabalhar
+    if len(dia_trabalho.batidas) % 2 != 0:
+        horas_trabalhadas = calcular_batidas_sem_par(dia_trabalho)
+        return horas_trabalhadas, calcular_horas_restantes(dia_trabalho, horas_trabalhadas)
+
+    horas_trabalhadas = calcular_horas_trabalhadas(dia_trabalho)
+
+    return horas_trabalhadas, calcular_horas_restantes(dia_trabalho, horas_trabalhadas)
+
+
 def calcular_horas_trabalhadas(dia_trabalho: DiaTrabalho) -> datetime.timedelta:
 
     batidas_datetime = [datetime.datetime.combine(dia_trabalho.data_trabalho, batida.hora_batida)
@@ -18,6 +30,14 @@ def calcular_horas_trabalhadas(dia_trabalho: DiaTrabalho) -> datetime.timedelta:
     return horas_trabalhadas
 
 
-def calcular_horas_restantes(dia_trabalho: DiaTrabalho) -> datetime.timedelta:
-    horas_trabalhadas = calcular_horas_trabalhadas(dia_trabalho)
+def calcular_horas_restantes(dia_trabalho: DiaTrabalho, horas_trabalhadas: datetime.timedelta) -> datetime.timedelta:
     return dia_trabalho.horas_para_trabalhar - horas_trabalhadas
+
+
+def calcular_batidas_sem_par(dia_trabalho: DiaTrabalho):
+    primeira_batida, ultima_batida = dia_trabalho.batidas[0], dia_trabalho.batidas[-1]
+    horas_trabalhadas = (
+        datetime.datetime.combine(dia_trabalho.data_trabalho, ultima_batida.hora_batida) -
+        datetime.datetime.combine(dia_trabalho.data_trabalho, primeira_batida.hora_batida)
+    )
+    return horas_trabalhadas
